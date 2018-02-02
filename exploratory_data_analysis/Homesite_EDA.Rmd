@@ -1,0 +1,89 @@
+---
+title: "Exploratory data analysis for Homesite Quote Conversion"
+author: "Juan L. Kehoe"
+date: "1/30/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+```
+
+# Basic information 
+Competition link: https://www.kaggle.com/c/homesite-quote-conversion    
+Data download link: https://www.kaggle.com/c/homesite-quote-conversion/data  
+
+## Purpose of the project
+Predict which customer will purchase a quoted insurance plan.
+
+## Data provided:
+This dataset represents the activity of a large number of customers who are interested in buying policies from Homesite. Each QuoteNumber corresponds to a potential customer and the QuoteConversion_Flag indicates whether the customer purchased a policy.
+
+The provided features are anonymized and provide a rich representation of the prospective customer and policy. They include specific coverage information, sales information, personal information, property information, and geographic information. Your task is to predict QuoteConversion_Flag for each QuoteNumber in the test set.   
+
+### Files
+- train.csv - the training set, contains QuoteConversion_Flag 
+- test.csv - the test set, does not contain QuoteConversion_Flag   
+
+# Exploratory data analysis
+## read data and check details
+```{r}
+# read data
+train <- read.csv("train.csv", stringsAsFactors = FALSE)
+# check data dimensions
+dim(train)
+```
+#### Types of Variable
+- Row indicator: QuoteNumber   
+- Target variable: QuoteConversion_Flag   
+- Predictor variable: The rest of the columns   
+
+#### Data Type
+- Character: Original_Quote_Date, Field6, Field12, CoverageField8, CoverageField9, PersonalField7, PersonalField16, PersonalField17, PersonalField18, PersonalField19, PropertyField3, PropertyField4, PropertyField5, PropertyField7, PropertyField14, PropertyField28, PropertyField30, PropertyField31, PropertyField32, PropertyField33, PropertyField34, PropertyField36, PropertyField37, PropertyField38, GeographicField63, GeographicField64   
+- Numeric: the rest   
+
+## transform data type
+```{r}
+# transform Original_Quote_Date to Date type
+train$Original_Quote_Date <- as.Date(train$Original_Quote_Date)
+# extract the month information
+train$Month <- as.numeric(format(train$Original_Quote_Date, "%m"))
+# extract year information
+train$Year <- as.numeric(format(train$Original_Quote_Date, "%Y"))
+# extract day information
+train$Day <- as.numeric(format(train$Original_Quote_Date, "%d"))
+```
+## save preprocessed data
+```{r}
+# save(train, test, file = "Homesite.RData")
+```
+## explore data in train set  
+### Visulize data in train
+```{r}
+# delete the QuoteNumber and Original_Quote_Date variables
+train$QuoteNumber = NULL
+train$Original_Quote_Date = NULL
+# plot for all the numeric varialbes 
+library(purrr)
+library(tidyr)
+library(ggplot2)
+library(trelliscopejs)
+library(gapminder)
+train %>%
+  keep(is.numeric) %>% 
+  gather(key=variable, value=value, -QuoteConversion_Flag)%>% 
+  ggplot(aes(x=value,fill= factor(QuoteConversion_Flag), color=factor(QuoteConversion_Flag))) +
+  facet_trelliscope(~ variable, scales = "free", nrow=2, ncol=3, name = "numerical", path = "pic") +
+  geom_histogram(aes(y=..density..),alpha=0.5, position="identity") 
+
+# plot all the character variables
+train$QuoteConversion_Flag <- as.character(train$QuoteConversion_Flag)
+library(reshape2)
+train %>%
+  keep(is.character) %>%
+  melt(id.vars="QuoteConversion_Flag") %>%
+  ggplot(aes(x=value, fill=QuoteConversion_Flag, color=QuoteConversion_Flag)) + 
+  facet_trelliscope(~ variable, scales = "free", nrow=2, ncol=3, name = "categorical", path = "pic") +
+  geom_bar(alpha=0.5, position=position_dodge())
+ 
+```

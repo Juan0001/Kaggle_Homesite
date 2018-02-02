@@ -1,0 +1,22 @@
+__loadDisplayList__ed96478b([
+  {
+    "group": "common",
+    "name": "categorical",
+    "desc": "",
+    "n": 27,
+    "height": 500,
+    "width": 500,
+    "updated": "2018-02-01 19:30:42",
+    "keySig": "109e4e26fa5cdef8094925639c51e2fc"
+  },
+  {
+    "group": "common",
+    "name": "numerical",
+    "desc": "",
+    "n": 272,
+    "height": 500,
+    "width": 500,
+    "updated": "2018-02-01 19:29:56",
+    "keySig": "555f4c3294c0fb372151e68a143b58dc"
+  }
+])
